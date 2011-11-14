@@ -10,16 +10,18 @@ class ScalaBot(hostname: String) extends Bot(hostname, "scalabot", "#scala") {
   val settings = new GenericRunnerSettings(channelOut.println _)
   settings.usejavacp.value = true;
   val interpreter = new IMain(settings, channelOut)
-
-  def handle(command: String, msg: String) : Option[String] = command match {
-    case ">" => {
-      interpreter.interpret(msg)
-      None
+  
+  val InterpreterCommand = ">(.*)".r
+  val NameCommand = "scalabot[,:]?(.*)".r
+  
+  def handle(message: String) : Option[String] = message match {
+    case InterpreterCommand(scalaCode) => {
+      interpreter.interpret(scalaCode)
+      None // The ChannelWriter handles output to channel
     }
-    case "scalabot" => {
+    case NameCommand(message) =>
       Some("Hi there! Try starting a message with '>' and I'll try to interpret it for you")
-    }
-    case x => None
+    case x => Some("Dunno")
   }
 }
 
